@@ -77,11 +77,7 @@ Search Flickr's image gallery!
 
 ## About The Project
 
-[![React Search Screenshot][https://res.cloudinary.com/codelikeagirl29/image/upload/v1652567412/screencapture-localhost-3000-react-flickr-api-2022-05-14-18_29_31_eaddgs.png]](https://example.com)
-
-    A React app to demonstrate my understanding of a few of React's best features - React Router Dom, using axios, using an API, with NavLink and several components.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+A React app to demonstrate my understanding of a few of React's best features - React Router Dom, using axios, using an API, with NavLink and several components.
 
 ### Built With
 
