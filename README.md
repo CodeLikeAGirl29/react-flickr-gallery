@@ -1,7 +1,9 @@
 # Gallery Image Search
 
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
+
 ![Flickr](https://a11ybadges.com/badge?logo=flickr)
+
 Built with React, using Flickr API for the search.
 Made by Lindsey.
 
