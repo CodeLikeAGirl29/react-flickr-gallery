@@ -20,12 +20,10 @@ class App extends Component {
 			loading: true,
 		};
 	}
-
 	componentDidMount() {
 		let query = this.state.searchQuery;
 		this.handleFetch(query);
 	}
-
 	/**
 	 * Updated to use Unsplash API
 	 * Uses Tailwind classes for the loading state and container layout
@@ -47,11 +45,9 @@ class App extends Component {
 				this.setState({ loading: false });
 			});
 	};
-
 	render() {
 		return (
 			<HashRouter>
-				{/* Background and font styling with Tailwind */}
 				<div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-12">
 					<Header />
 					<div className="bg-slate-50/80 backdrop-blur-md sticky top-0 z-10 py-6 mb-8">
@@ -61,48 +57,58 @@ class App extends Component {
 						<Nav fetchNav={this.handleFetch} />
 					</div>
 
+					{/* Integrated Loading Spinner */}
+					{this.state.loading && (
+						<div className="flex flex-col justify-center items-center py-20">
+							<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
+							<p className="text-slate-500 font-medium animate-pulse">Fetching high-res goodness...</p>
+						</div>
+					)}
 
-					<Switch>
-						<Route
-							exact
-							path='/'
-							render={(props) => (
-								<PhotoContainer
-									{...props}
-									data={this.state.photos}
-									loading={this.state.loading}
-								/>
-							)}
-						/>
-						<Route
-							path='/architecture'
-							render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} />} />
-						<Route
-							path='/wilderness'
-							render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} />}
-						/>
-						<Route
-							path='/minimal'
-							render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} />}
-						/>
-						<Route
-							path='/textures'
-							render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} />}
-						/>
-
-						<Route
-							path='/search/:input'
-							render={(props) => (
-								<PhotoContainer
-									{...props}
-									data={this.state.photos}
-									handleSearch={this.handleFetch}
-									loading={this.state.loading}
-								/>
-							)}
-						/>
-						<Route component={PageNotFound} />
-					</Switch>
+					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+						<Switch>
+							<Route
+								exact
+								path='/'
+								render={(props) => (
+									<PhotoContainer
+										{...props}
+										data={this.state.photos}
+										loading={this.state.loading}
+										handleSearch={this.handleFetch} // Added this missing line!
+									/>
+								)}
+							/>
+							<Route
+								path='/architecture'
+								render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} loading={this.state.loading} />}
+							/>
+							<Route
+								path='/wilderness'
+								render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} loading={this.state.loading} />}
+							/>
+							<Route
+								path='/minimal'
+								render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} loading={this.state.loading} />}
+							/>
+							<Route
+								path='/textures'
+								render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} loading={this.state.loading} />}
+							/>
+							<Route
+								path='/search/:input'
+								render={(props) => (
+									<PhotoContainer
+										{...props}
+										data={this.state.photos}
+										handleSearch={this.handleFetch}
+										loading={this.state.loading}
+									/>
+								)}
+							/>
+							<Route component={PageNotFound} />
+						</Switch>
+					</div>
 				</div>
 			</HashRouter >
 		);
