@@ -2,15 +2,14 @@ import React, { Component } from "react";
 import axios from "axios";
 import apiKey from "./config";
 import { HashRouter, Route, Switch } from "react-router-dom";
+import Cookies from "js-cookie";
 
 // components
 import SearchForm from "./components/SearchForm";
 import Nav from "./components/Nav";
 import PhotoContainer from "./components/PhotoContainer";
 import PageNotFound from "./components/PageNotFound";
-import Header from "./components/Header";
-
-import Cookies from "js-cookie";
+import Header from './components/Header';
 
 class App extends Component {
 	constructor(props) {
@@ -24,41 +23,45 @@ class App extends Component {
 
 	componentDidMount() {
 		let query = this.state.searchQuery;
-		console.log(query);
 		this.handleFetch(query);
 	}
 
+	/**
+	 * Updated to use Unsplash API
+	 * Uses Tailwind classes for the loading state and container layout
+	 */
 	handleFetch = (query) => {
 		this.setState({
 			loading: true,
 		});
-		axios
-			.get(
-				`https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&tags=${query}&per_page=24&extras=url_o&format=json&nojsoncallback=1`
-			)
+		axios.get(`https://api.unsplash.com/search/photos?query=${query}&client_id=${apiKey}`)
 			.then((res) => {
 				this.setState({
-					photos: res.data.photos.photo,
+					// Unsplash returns data in res.data.results
+					photos: res.data.results,
 					loading: false,
 				});
 			})
 			.catch((error) => {
 				console.log("Error fetching and parsing data", error);
+				this.setState({ loading: false });
 			});
 	};
 
 	render() {
 		return (
 			<HashRouter>
-				<Header />
-				<div className='container'>
-					<div className='search-container'>
-						<SearchForm handleSearch={this.handleFetch} />
+				{/* Background and font styling with Tailwind */}
+				<div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-12">
+					<Header />
+					<div className="bg-slate-50/80 backdrop-blur-md sticky top-0 z-10 py-6 mb-8">
+						<div className="max-w-md mx-auto mb-6">
+							<SearchForm handleSearch={this.handleFetch} />
+						</div>
+						<Nav fetchNav={this.handleFetch} />
 					</div>
-					<Nav fetchNav={this.handleFetch} />
-					{this.state.loading ? (
-						<p className='loading'>Loading content...</p>
-					) : null}
+
+
 					<Switch>
 						<Route
 							exact
@@ -72,29 +75,22 @@ class App extends Component {
 							)}
 						/>
 						<Route
-							exact
-							path='/cityscapes'
-							render={(props) => (
-								<PhotoContainer {...props} data={this.state.photos} />
-							)}
+							path='/architecture'
+							render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} />} />
+						<Route
+							path='/wilderness'
+							render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} />}
 						/>
 						<Route
-							exact
-							path='/bmw'
-							render={(props) => (
-								<PhotoContainer {...props} data={this.state.photos} />
-							)}
+							path='/minimal'
+							render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} />}
 						/>
 						<Route
-							exact
-							path='/mountains'
-							render={(props) => (
-								<PhotoContainer {...props} data={this.state.photos} />
-							)}
+							path='/textures'
+							render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} />}
 						/>
 
 						<Route
-							exact
 							path='/search/:input'
 							render={(props) => (
 								<PhotoContainer
@@ -108,7 +104,7 @@ class App extends Component {
 						<Route component={PageNotFound} />
 					</Switch>
 				</div>
-			</HashRouter>
+			</HashRouter >
 		);
 	}
 }

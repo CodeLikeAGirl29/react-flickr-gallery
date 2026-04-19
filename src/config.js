@@ -1,2 +1,2 @@
-const apiKey = "6b65c80fc861a26a82280a763a4e1d13";
+const apiKey = import.meta.env.VITE_UNSPLASH_API_KEY;
 export default apiKey;

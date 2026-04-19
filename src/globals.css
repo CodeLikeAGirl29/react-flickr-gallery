@@ -1,5 +1,32 @@
-@import url("https://fonts.googleapis.com/css?family=Arvo&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Bitter&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    body {
+        @apply antialiased bg-slate-50;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+}
+
+/* Smooth scrolling for the whole page */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for a cleaner look */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-slate-100;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 rounded-full hover:bg-slate-400 transition-colors;
+}
+
 body {
     text-align: center;
     font-family: "Arvo", serif;
@@ -7,7 +34,7 @@ body {
     margin: 0px;
 }
 
-.header {
+/* .header {
     float: left;
     position: absolute;
     font-family: "Bitter", serif;
@@ -132,11 +159,17 @@ nav.main-nav {
 }
 
 .photo-container ul {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-evenly;
-    -ms-align-items: flex-start;
-    align-items: flex-start;
+    display: column;
+    column-count: 3;
+    column-gap: 1.5rem;
+    padding: 0;
+    list-style: none;
+}
+
+.photo-container li {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease;
 }
 
 .photo-container ul li {
@@ -171,16 +204,41 @@ nav.main-nav {
     width: 100%;
 }
 
+.photo-container li:hover {
+    transform: scale(1.03);
+}
+
+.photo-container img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .photo-container ul {
+        column-count: 2;
+    }
+}
+
+@media (max-width: 600px) {
+    .photo-container ul {
+        column-count: 1;
+    }
+}
+
 @media only screen and (min-width: 1000px) {
     .container {
         max-width: 1280px;
         margin: auto;
         width: 75%;
     }
+
     .main-nav ul {
         display: flex;
         justify-content: center;
     }
+
     .main-nav li {
         margin: 10px;
         width: 100px;
@@ -195,12 +253,16 @@ nav.main-nav {
         width: 50%;
         float: none;
     }
+
     .photo-container li {
         margin: auto;
     }
+
     .main-nav li {
         width: 75%;
         margin-left: auto;
         margin-right: auto;
     }
 }
+
+*/
