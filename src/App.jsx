@@ -15,7 +15,7 @@ class App extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			searchQuery: Cookies.getJSON("searchQuery") || "ocean",
+			searchQuery: Cookies.get("searchQuery") || "ocean",
 			photos: [],
 			loading: true,
 		};
