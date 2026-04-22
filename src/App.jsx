@@ -10,6 +10,7 @@ import Nav from "./components/Nav";
 import PhotoContainer from "./components/PhotoContainer";
 import PageNotFound from "./components/PageNotFound";
 import Header from './components/Header';
+import SocialSidebar from './components/SocialSidebar';
 
 const App = () => {
 	const [photos, setPhotos] = useState([]);
@@ -51,6 +52,7 @@ const App = () => {
 	return (
 		<HashRouter>
 			<div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-12">
+				<SocialSidebar />
 				<Header />
 				<div className="bg-slate-50/80 backdrop-blur-md sticky top-0 z-10 py-6 mb-8">
 					<div className="max-w-md mx-auto mb-6">
