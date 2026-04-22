@@ -1,66 +1,52 @@
-// src/components/PhotoContainer.jsx
-import React, { Component } from "react";
+import React, { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import Photos from "./Photos";
 import NotFound from "./NotFound";
 
-class PhotoContainer extends Component {
-	// 1. Initial Load: Fetch data when component first mounts
-	componentDidMount() {
-		this.performSearch();
-	}
+const PhotoContainer = ({ data, loading, handleSearch, isFetchingMore }) => {
+	const { topic } = useParams();
 
-	// 2. Button Clicks: Detect when the URL changes (e.g., from /bmw to /mountains)
-	componentDidUpdate(prevProps) {
-		// We check if the pathname has changed to avoid infinite fetch loops
-		if (prevProps.location.pathname !== this.props.location.pathname) {
-			this.performSearch();
+	// Handle URL changes
+	useEffect(() => {
+		if (topic) {
+			handleSearch(topic, true);
 		}
-	}
+	}, [topic]);
 
-	// 3. Logic: Determine what to search for based on the URL
-	performSearch = () => {
-		const { match, handleSearch } = this.props;
+	// Handle Infinite Scroll
+	useEffect(() => {
+		const handleScroll = () => {
+			const scrollCheck = window.innerHeight + document.documentElement.scrollTop + 100 >= document.documentElement.offsetHeight;
 
-		// Logic: If there's an :input param (from SearchForm), use it. 
-		// Otherwise, grab the name from the path (for the Nav buttons).
-		let query = match.params.input || match.path.replace("/", "");
+			if (scrollCheck && !loading && !isFetchingMore) {
+				handleSearch(topic || "ocean", false);
+			}
+		};
 
-		// Fallback: If we're on the root path "/"
-		if (query === "" || query === "search") {
-			query = "ocean";
-		}
+		window.addEventListener('scroll', handleScroll);
+		return () => window.removeEventListener('scroll', handleScroll);
+	}, [loading, isFetchingMore, topic, handleSearch]);
 
-		handleSearch(query);
-	};
+	if (loading && data.length === 0) return null;
 
-	render() {
-		const { data, loading, match } = this.props;
-		const title = match.params.input || match.path.replace("/", "");
+	return (
+		<div className="photo-container pb-20">
+			<h2 className="text-4xl font-extrabold text-slate-800 mb-8 capitalize tracking-tight">
+				{topic || "Discover"}
+			</h2>
 
-		if (loading) return null; // Let App.jsx handle the loading spinner
-
-		return (
-			<div className="photo-container pb-20">
-				{/* Modern Title - capitalized dynamically */}
-				<h2 className="text-4xl font-extrabold text-slate-800 mb-8 capitalize tracking-tight">
-					{title || "Discover"}
-				</h2>
-
-				{data.length > 0 ? (
-					/* Modern Masonry Grid using Tailwind Columns */
-					<ul className="columns-1 gap-6 sm:columns-2 lg:columns-3 xl:columns-4 [column-fill:_balance]">
-						{data.map((photo) => (
-							<Photos key={photo.id} photo={photo} />
-						))}
-					</ul>
-				) : (
-					<div className="py-20">
-						<NotFound />
-					</div>
-				)}
-			</div>
-		);
-	}
-}
+			{data.length > 0 ? (
+				<ul className="columns-1 gap-6 sm:columns-2 lg:columns-3 xl:columns-4 [column-fill:_balance]">
+					{data.map((photo, index) => (
+						// Using index + id ensures unique keys when appending more photos
+						<Photos key={`${photo.id}-${index}`} photo={photo} />
+					))}
+				</ul>
+			) : (
+				!loading && <div className="py-20"><NotFound /></div>
+			)}
+		</div>
+	);
+};
 
 export default PhotoContainer;

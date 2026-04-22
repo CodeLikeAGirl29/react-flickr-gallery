@@ -1,7 +1,7 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import apiKey from "./config";
-import { HashRouter, Route, Switch } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import Cookies from "js-cookie";
 
 // components
@@ -11,108 +11,96 @@ import PhotoContainer from "./components/PhotoContainer";
 import PageNotFound from "./components/PageNotFound";
 import Header from './components/Header';
 
-class App extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			searchQuery: Cookies.get("searchQuery") || "ocean",
-			photos: [],
-			loading: true,
-		};
-	}
-	componentDidMount() {
-		let query = this.state.searchQuery;
-		this.handleFetch(query);
-	}
-	/**
-	 * Updated to use Unsplash API
-	 * Uses Tailwind classes for the loading state and container layout
-	 */
-	handleFetch = (query) => {
-		this.setState({
-			loading: true,
-		});
-		axios.get(`https://api.unsplash.com/search/photos?query=${query}&client_id=${apiKey}`)
+const App = () => {
+	const [photos, setPhotos] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [isFetchingMore, setIsFetchingMore] = useState(false);
+	const [page, setPage] = useState(1);
+	const [searchQuery, setSearchQuery] = useState(Cookies.get("searchQuery") || "ocean");
+
+	const handleFetch = (query, isNewSearch = true) => {
+		const nextPage = isNewSearch ? 1 : page + 1;
+
+		if (isNewSearch) {
+			setLoading(true);
+			setPhotos([]); // Clear existing photos for new search
+		} else {
+			setIsFetchingMore(true);
+		}
+
+		axios.get(`https://api.unsplash.com/search/photos?query=${query}&client_id=${apiKey}&page=${nextPage}&per_page=20`)
 			.then((res) => {
-				this.setState({
-					// Unsplash returns data in res.data.results
-					photos: res.data.results,
-					loading: false,
-				});
+				setPhotos(prev => isNewSearch ? res.data.results : [...prev, ...res.data.results]);
+				setPage(nextPage);
+				setSearchQuery(query);
+				if (isNewSearch) Cookies.set("searchQuery", query);
 			})
-			.catch((error) => {
-				console.log("Error fetching and parsing data", error);
-				this.setState({ loading: false });
+			.catch((err) => {
+				console.log("Error fetching and parsing data", err);
+			})
+			.finally(() => {
+				setLoading(false);
+				setIsFetchingMore(false);
 			});
 	};
-	render() {
-		return (
-			<HashRouter>
-				<div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-12">
-					<Header />
-					<div className="bg-slate-50/80 backdrop-blur-md sticky top-0 z-10 py-6 mb-8">
-						<div className="max-w-md mx-auto mb-6">
-							<SearchForm handleSearch={this.handleFetch} />
-						</div>
-						<Nav fetchNav={this.handleFetch} />
-					</div>
 
-					{/* Integrated Loading Spinner */}
-					{this.state.loading && (
-						<div className="flex flex-col justify-center items-center py-20">
-							<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
-							<p className="text-slate-500 font-medium animate-pulse">Fetching high-res goodness...</p>
-						</div>
-					)}
-
-					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-						<Switch>
-							<Route
-								exact
-								path='/'
-								render={(props) => (
-									<PhotoContainer
-										{...props}
-										data={this.state.photos}
-										loading={this.state.loading}
-										handleSearch={this.handleFetch} // Added this missing line!
-									/>
-								)}
-							/>
-							<Route
-								path='/architecture'
-								render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} loading={this.state.loading} />}
-							/>
-							<Route
-								path='/wilderness'
-								render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} loading={this.state.loading} />}
-							/>
-							<Route
-								path='/minimal'
-								render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} loading={this.state.loading} />}
-							/>
-							<Route
-								path='/textures'
-								render={(props) => <PhotoContainer {...props} handleSearch={this.handleFetch} data={this.state.photos} loading={this.state.loading} />}
-							/>
-							<Route
-								path='/search/:input'
-								render={(props) => (
-									<PhotoContainer
-										{...props}
-										data={this.state.photos}
-										handleSearch={this.handleFetch}
-										loading={this.state.loading}
-									/>
-								)}
-							/>
-							<Route component={PageNotFound} />
-						</Switch>
+	return (
+		<HashRouter>
+			<div className="min-h-screen bg-slate-50 text-slate-900 font-sans pb-12">
+				<Header />
+				<div className="bg-slate-50/80 backdrop-blur-md sticky top-0 z-10 py-6 mb-8">
+					<div className="max-w-md mx-auto mb-6">
+						<SearchForm handleSearch={(q) => handleFetch(q, true)} />
 					</div>
+					<Nav fetchNav={(q) => handleFetch(q, true)} />
 				</div>
-			</HashRouter >
-		);
-	}
-}
+
+				{/* Original Loading Spinner Style */}
+				{loading && (
+					<div className="flex flex-col justify-center items-center py-20">
+						<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mb-4"></div>
+						<p className="text-slate-500 font-medium animate-pulse">Fetching high-res goodness...</p>
+					</div>
+				)}
+
+				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<Routes>
+						<Route path="/" element={<Navigate to="/ocean" />} />
+						<Route
+							path="/:topic"
+							element={
+								<PhotoContainer
+									data={photos}
+									handleSearch={handleFetch}
+									loading={loading}
+									isFetchingMore={isFetchingMore}
+								/>
+							}
+						/>
+						<Route
+							path="/search/:topic"
+							element={
+								<PhotoContainer
+									data={photos}
+									handleSearch={handleFetch}
+									loading={loading}
+									isFetchingMore={isFetchingMore}
+								/>
+							}
+						/>
+						<Route path="*" element={<PageNotFound />} />
+					</Routes>
+				</div>
+
+				{/* Infinite Scroll Spinner */}
+				{isFetchingMore && (
+					<div className="flex justify-center py-10">
+						<div className="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-600"></div>
+					</div>
+				)}
+			</div>
+		</HashRouter>
+	);
+};
 
 export default App;
