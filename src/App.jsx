@@ -19,6 +19,10 @@ const App = () => {
 	const [searchQuery, setSearchQuery] = useState(Cookies.get("searchQuery") || "ocean");
 
 	const handleFetch = (query, isNewSearch = true) => {
+		if (!apiKey) {
+			console.error("API Key is missing. Check Vercel Env Vars.");
+			return;
+		}
 		const nextPage = isNewSearch ? 1 : page + 1;
 
 		if (isNewSearch) {
