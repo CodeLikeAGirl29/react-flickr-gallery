@@ -9,11 +9,38 @@ const Nav = () => {
 	return (
 		<nav className="mt-4">
 			<ul className="flex flex-wrap justify-center gap-4">
-				{/* These NavLinks change the URL, which PhotoContainer will detect */}
-				<li><NavLink to='/architecture' className={linkClass} activeStyle={{ backgroundColor: '#2563eb', color: 'white' }}>Architecture</NavLink></li>
-				<li><NavLink to='/wilderness' className={linkClass} activeStyle={{ backgroundColor: '#2563eb', color: 'white' }}>Wilderness</NavLink></li>
-				<li><NavLink to='/minimal' className={linkClass} activeStyle={{ backgroundColor: '#2563eb', color: 'white' }}>Minimal</NavLink></li>
-				<li><NavLink to='/textures' className={linkClass} activeStyle={{ backgroundColor: '#2563eb', color: 'white' }}>Textures</NavLink></li>
+				<li>
+					<NavLink
+						to='/architecture'
+						className={({ isActive }) => isActive ? `${linkClass} ${activeClass}` : linkClass}
+					>
+						Architecture
+					</NavLink>
+				</li>
+				<li>
+					<NavLink
+						to='/wilderness'
+						className={({ isActive }) => isActive ? `${linkClass} ${activeClass}` : linkClass}
+					>
+						Wilderness
+					</NavLink>
+				</li>
+				<li>
+					<NavLink
+						to='/minimal'
+						className={({ isActive }) => isActive ? `${linkClass} ${activeClass}` : linkClass}
+					>
+						Minimal
+					</NavLink>
+				</li>
+				<li>
+					<NavLink
+						to='/textures'
+						className={({ isActive }) => isActive ? `${linkClass} ${activeClass}` : linkClass}
+					>
+						Textures
+					</NavLink>
+				</li>
 			</ul>
 		</nav>
 	);
